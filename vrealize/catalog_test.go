@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-
-	"gopkg.in/jarcoal/httpmock.v1"
 )
 
 func init() {
