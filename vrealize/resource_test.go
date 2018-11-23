@@ -341,7 +341,7 @@ func TestConfigValidityFunction(t *testing.T) {
 	var mockInvalidKeys []string
 	mockInvalidKeys = append(mockInvalidKeys, "mock.machine3.vSphere.mock.cpu")
 
-	validityErr := fmt.Sprintf(utils.CONFIG_INVALID_ERROR, strings.Join(mockInvalidKeys, ", "))
+	validityErr := fmt.Sprintf(utils.CONFIG_INVALID_ERROR, strings.Join(mockInvalidKeys, ", "), strings.Join(mockInvalidKeys, ", "))
 	err = checkResourceConfigValidity(mockRequestTemplate)
 	// this should throw an error as none of the string combinations (mock, mock.machine3, mock.machine3.vsphere, etc)
 	// matches the component names(mock.test.machine1 and machine2) in the request template
