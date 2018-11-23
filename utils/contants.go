@@ -44,7 +44,7 @@ const (
 	FAILED                 = "FAILED"
 
 	// error constants
-	CONFIG_INVALID_ERROR          = "The resource_configuration in the config file has invalid component name(s): %v "
+	CONFIG_INVALID_ERROR          = "The resource_configuration in the config file has invalid component name(s): %v. Expected components: %v"
 	DESTROY_ACTION_TEMPLATE_ERROR = "Error retrieving destroy action template for the deployment %v: %v "
 
 	// api constants

@@ -647,27 +647,41 @@ func (vRAClient *APIClient) RequestCatalogItem(requestTemplate *CatalogItemReque
 	return catalogRequest, nil
 }
 
+//KeysString takes a map[string]string and returns a string "[key1, key2,...]"
+func KeysString(m map[string]interface{}) string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return "[" + strings.Join(keys, ", ") + "]"
+}
+
 // check if the resource configuration is valid in the terraform config file
 func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) error {
 	log.Info("Checking if the terraform config file is valid")
 
 	// Get all component names in the blueprint corresponding to the catalog item.
 	componentSet := make(map[string]bool)
+	noncomponentSet := make(map[string]bool)
+	// non-components are strings, integers... in template.data
 	for field := range requestTemplate.Data {
 		if reflect.ValueOf(requestTemplate.Data[field]).Kind() == reflect.Map {
 			componentSet[field] = true
+		} else if reflect.ValueOf(requestTemplate.Data[field]).Kind() != reflect.String {
+			noncomponentSet[field] = true
 		}
 	}
-	log.Info("The component name(s) in the blueprint corresponding to the catalog item: %v\n", componentSet)
+
+	log.Info(fmt.Sprintf("The component name(s) in the blueprint corresponding to the catalog item: %#v\n", componentSet))
 
 	var invalidKeys []string
 	// check if the keys in the resourceConfiguration map exists in the componentSet
 	// if the key in config is machine1.vsphere.custom.location, match every string after each dot
 	// until a matching string is found in componentSet.
 	// If found, it's a valid key else the component name is invalid
-	for k := range resourceConfiguration {
-		var key = k
-		var isValid bool
+	for field := range resourceConfiguration {
+		var key = field
+		var isValid = false
 		for strings.LastIndex(key, ".") != -1 {
 			lastIndex := strings.LastIndex(key, ".")
 			key = key[0:lastIndex]
@@ -677,14 +691,21 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 				break
 			}
 		}
+		// Some vRA catalogs do not have 'components' at all, all the data configuration
+		// is directly at the toplevel.
+
+		if _, ok := noncomponentSet[field]; ok {
+			log.Info("The resource_configuration field '%s' is supposed to be a component (e.g., Machine1 in Machine1.cpu) but found a matching field '%s' in the template data", field, field)
+			isValid = true
+		}
 		if !isValid {
-			invalidKeys = append(invalidKeys, k)
+			invalidKeys = append(invalidKeys, fmt.Sprintf("%s [from field: %s]", key, field))
 		}
 	}
 	// there are invalid resource config keys in the terraform config file, abort and throw an error
 	if len(invalidKeys) > 0 {
 		log.Error("The resource_configuration in the config file has invalid component name(s): %v ", strings.Join(invalidKeys, ", "))
-		return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "))
+		return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
 	}
 	return nil
 }
