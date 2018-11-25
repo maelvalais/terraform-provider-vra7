@@ -76,6 +76,14 @@
   version = "v3.5.1"
 
 [[projects]]
+  digest = "1:0deddd908b6b4b768cfc272c16ee61e7088a60f7fe2f06c547bd3d8e1f8b8e77"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = ""
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:ee44d4de102276888a69df382c76c3dff0da8c3f5ac5393f3a3d3447a1203fd7"
   name = "github.com/dghubble/sling"
   packages = ["."]
@@ -212,6 +220,14 @@
   revision = "fa9f258a92500514cc8e9c67020487709df92432"
 
 [[projects]]
+  digest = "1:51430c345f48c781f7f43146b574ec498c62c608bfff3715fef4c915d96ed4fc"
+  name = "github.com/hashicorp/logutils"
+  packages = ["."]
+  pruneopts = ""
+  revision = "a335183dfd075f638afcc820c90591ca3c97eba6"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:b4261d9a27f7642710589ea084f5381cd737af75d8720f83b918c86e60902fe2"
   name = "github.com/hashicorp/terraform"
   packages = [
@@ -219,8 +235,11 @@
     "config/module",
     "dag",
     "flatmap",
+    "helper/config",
     "helper/hashcode",
     "helper/hilmapstructure",
+    "helper/logging",
+    "helper/resource",
     "helper/schema",
     "moduledeps",
     "plugin",
@@ -466,6 +485,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/dghubble/sling",
+    "github.com/hashicorp/terraform/helper/resource",
     "github.com/hashicorp/terraform/helper/schema",
     "github.com/hashicorp/terraform/plugin",
     "github.com/hashicorp/terraform/terraform",
