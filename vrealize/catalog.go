@@ -117,7 +117,7 @@ func (c *APIClient) readCatalogItemIDByName(catalogName string) (string, error) 
 		return "", apiError
 	}
 
-	if resp.StatusCode != 200 {
+	if errResp != nil || resp.StatusCode != 200 {
 		return "", errResp
 	}
 
