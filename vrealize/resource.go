@@ -85,18 +85,18 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 		return validityErr
 	}
 
-	for field1 := range catalogConfiguration {
-		requestTemplate.Data[field1] = catalogConfiguration[field1]
-	}
-
 	// Get all component names in the blueprint corresponding to the catalog item.
 	var componentNameList []string
+	var nonComponentNameList []string
 	for field := range requestTemplate.Data {
 		if reflect.ValueOf(requestTemplate.Data[field]).Kind() == reflect.Map {
 			componentNameList = append(componentNameList, field)
+		} else {
+			nonComponentNameList = append(nonComponentNameList, field)
 		}
 	}
-	log.Info("createResource->key_list %v\n", componentNameList)
+	log.Info("createResource->key_list (<component>.<property> in resource_configuration) %v\n", componentNameList)
+	log.Info("createResource->key_list (direct <properties> in resource_configuration) %v\n", nonComponentNameList)
 
 	// Arrange component names in descending order of text length.
 	// Component names are sorted this way because '.', which is used as a separator, may also occur within
@@ -125,6 +125,109 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 				break
 			}
 		}
+	}
+
+	for _, field1 := range nonComponentNameList {
+		// Non-component fields are directly added. Non-components are resource
+		// configuration keys that do not match the pattern:
+		//     <component name>.<property name>
+		// but instead have a single <property name> and no component:
+		//     <property name>
+		value := resourceConfiguration[field1]
+		switch field1 {
+		case "AZ",
+			"OS",
+			"backupPlanned",
+			"clientEntity",
+			"cloudInitData",
+			"codeBasicat",
+			"commentaire",
+			"cos",
+			"cpu",
+			"currentDiskSizeOfBlueprint",
+			"customRoleValue",
+			"diskData",
+			"domainType",
+			"drsGroupDesc",
+			"groupeDRS",
+			"labelCPU",
+			"labelDataDiskSize",
+			"labelDataDiskThreshold",
+			"labelRam",
+			"labelThresholdCPU",
+			"labelThresholdMemory",
+			"module_applicatif",
+			"niveauSupport",
+			"ram",
+			"region",
+			"role",
+			"searchBasicat",
+			"searchSecurityGroupName",
+			"securityGroupName",
+			"serverType",
+			"supportEntity",
+			"typeServerFullName",
+			"typeServeur",
+			"vmSuffix",
+			"bgName":
+			requestTemplate.Data[field1] = value
+		// string or nullable:
+		case "optionalPLI",
+			"mendatoryPLI",
+			"predefinedRole",
+			"backupLabelsSelected":
+			requestTemplate.Data[field1] = value
+		// array or string:
+		case "cactusGroupNames":
+			requestTemplate.Data[field1] = value
+		// bool:
+		case "hasBasicat",
+			"isBGFast",
+			"leaseUnlimited",
+			"customRole",
+			"addDRSGroup",
+			"useCloudInit":
+			if value != nil {
+				if value.(string) == "1" || value.(string) == "true" {
+					requestTemplate.Data[field1] = true
+				} else if value.(string) == "0" || value.(string) == "false" {
+					requestTemplate.Data[field1] = false
+				} else {
+					log.Error(fmt.Sprintf("boolean expected for field '%v'. String is '%v'", field1, value))
+					panic(fmt.Sprintf("boolean expected for field '%v'. String is '%v'", field1, value))
+				}
+			}
+			log.Info("BOOL: %v = %v is %T", field1, requestTemplate.Data[field1], requestTemplate.Data[field1])
+		// integers
+		case "lease",
+			"targetDiskSizeOfVm":
+			if str, ok := value.(string); ok {
+				if i, err := strconv.Atoi(str); err == nil {
+					requestTemplate.Data[field1] = i
+				} else {
+					log.Error(fmt.Sprintf("integer expected for field '%v'. String is '%v'", field1, str))
+					panic(fmt.Sprintf("integer expected for field '%v'. String is '%v'", field1, str))
+				}
+			}
+
+			log.Info("INT: %v = %v is %v", field1, requestTemplate.Data[field1], reflect.ValueOf(requestTemplate.Data[field1]).Kind().String)
+		case "reasons",
+			"description":
+			// Do nothing
+		default:
+			log.Info("unknown option [%s] with value [%s] ignoring\n", field1, resourceConfiguration[field1])
+		}
+	}
+	// for _, field1 := range nonComponentNameList {
+	// 	requestTemplate.Data[field1] = resourceConfiguration[field1]
+	// }
+	for _, propertyName := range nonComponentNameList {
+		log.Info("Type of %v: %T (value: %v)", propertyName, requestTemplate.Data[propertyName], requestTemplate.Data[propertyName])
+	}
+
+	// Add the catalog_configuration ('description', 'reasons'...)
+	for field1 := range catalogConfiguration {
+		requestTemplate.Data[field1] = catalogConfiguration[field1]
 	}
 
 	//update template with deployment level config
@@ -667,12 +770,12 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 	for field := range requestTemplate.Data {
 		if reflect.ValueOf(requestTemplate.Data[field]).Kind() == reflect.Map {
 			componentSet[field] = true
-		} else if reflect.ValueOf(requestTemplate.Data[field]).Kind() != reflect.String {
+		} else {
 			noncomponentSet[field] = true
 		}
 	}
 
-	log.Info(fmt.Sprintf("The component name(s) in the blueprint corresponding to the catalog item: %#v\n", componentSet))
+	log.Info(fmt.Sprint("The component name(s) in the blueprint corresponding to the catalog item: ", componentSet))
 
 	var invalidKeys []string
 	// check if the keys in the resourceConfiguration map exists in the componentSet
@@ -703,10 +806,10 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 		}
 	}
 	// there are invalid resource config keys in the terraform config file, abort and throw an error
-	if len(invalidKeys) > 0 {
-		log.Error("The resource_configuration in the config file has invalid component name(s): %v ", strings.Join(invalidKeys, ", "))
-		return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
-	}
+	// if len(invalidKeys) > 0 {
+	// 	log.Error("The resource_configuration in the config file has invalid component name(s): %v ", strings.Join(invalidKeys, ", "))
+	// 	return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
+	// }
 	return nil
 }
 
@@ -759,11 +862,11 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 	if err != nil {
 		return nil, err
 	}
-	log.Info("The request template data corresponding to the catalog item %v is: \n %v\n", catalogItemID, requestTemplate.Data)
+	log.Infof("The request template data corresponding to the catalog item %+v is: \n %+v\n", catalogItemID, requestTemplate.Data)
 
 	for field1 := range catalogConfiguration {
 		requestTemplate.Data[field1] = catalogConfiguration[field1]
-
+		log.Infof("field %+v:%+v\n", field1, requestTemplate.Data[field1])
 	}
 	// get the business group id from name
 	var businessGroupIdFromName string
