@@ -473,6 +473,14 @@
   version = "v1.6.0"
 
 [[projects]]
+  digest = "1:6a8a36d8b25b669d77ff638f7acdf4d3439ce6c349461f246b2c450b0b4b3bc8"
+  name = "gopkg.in/h2non/gock.v1"
+  packages = ["."]
+  pruneopts = ""
+  revision = "a6029d17e101ac1594adafea9e63fd8c988a8701"
+  version = "v1.0.12"
+
+[[projects]]
   branch = "v1"
   digest = "1:067954126f4f0f7ac513233125d68ff932cce03fc73ebba4dee905926ca3f4c4"
   name = "gopkg.in/jarcoal/httpmock.v1"
@@ -490,6 +498,7 @@
     "github.com/hashicorp/terraform/plugin",
     "github.com/hashicorp/terraform/terraform",
     "github.com/op/go-logging",
+    "gopkg.in/h2non/gock.v1",
     "gopkg.in/jarcoal/httpmock.v1",
   ]
   solver-name = "gps-cdcl"
