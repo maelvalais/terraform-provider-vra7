@@ -6,6 +6,7 @@ const (
 	BUSINESS_GROUP_ID        = "businessgroup_id"
 	BUSINESS_GROUP_NAME      = "businessgroup_name"
 	WAIT_TIME_OUT            = "wait_timeout"
+	REFRESH_SECONDS          = "refresh_seconds"
 	FAILED_MESSAGE           = "failed_message"
 	DEPLOYMENT_CONFIGURATION = "deployment_configuration"
 	RESOURCE_CONFIGURATION   = "resource_configuration"

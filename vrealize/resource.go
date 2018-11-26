@@ -487,7 +487,7 @@ func deleteResource(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	waitTimeout := d.Get(utils.WAIT_TIME_OUT).(int) * 60
-	sleepFor := 30
+	sleepFor := d.Get(utils.REFRESH_SECONDS).(int)
 	for i := 0; i < waitTimeout/sleepFor; i++ {
 		time.Sleep(time.Duration(sleepFor) * time.Second)
 		log.Info("Checking to see if resource is deleted.")
@@ -792,7 +792,7 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 func waitForRequestCompletion(d *schema.ResourceData, meta interface{}) error {
 
 	waitTimeout := d.Get(utils.WAIT_TIME_OUT).(int) * 60
-	sleepFor := 30
+	sleepFor := d.Get(utils.REFRESH_SECONDS).(int)
 	request_status := ""
 	for i := 0; i < waitTimeout/sleepFor; i++ {
 		log.Info("Waiting for %d seconds before checking request status.", sleepFor)

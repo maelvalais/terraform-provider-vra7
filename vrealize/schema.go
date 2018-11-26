@@ -224,6 +224,11 @@ func resourceSchema() map[string]*schema.Schema {
 			Optional: true,
 			Default:  15,
 		},
+		utils.REFRESH_SECONDS: {
+			Type:     schema.TypeInt,
+			Optional: true,
+			Default:  30,
+		},
 		utils.REQUEST_STATUS: {
 			Type:     schema.TypeString,
 			Computed: true,
