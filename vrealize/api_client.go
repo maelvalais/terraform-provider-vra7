@@ -1,9 +1,7 @@
 package vrealize
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/dghubble/sling"
@@ -46,10 +44,11 @@ type ActionResponseTemplate struct {
 func NewClient(username string, password string, tenant string, baseURL string, insecure bool) APIClient {
 	// This overrides the DefaultTransport which is probably ok
 	// since we're generally only using a single client.
-	transport := http.DefaultTransport.(*http.Transport)
-	transport.TLSClientConfig = &tls.Config{
-		InsecureSkipVerify: insecure,
-	}
+	// http.DefaultTransport.(*http.Transport)
+	// transport.TLSClientConfig = &tls.Config{
+	// 	InsecureSkipVerify: insecure,
+	// }
+
 	return APIClient{
 		Username: username,
 		Password: password,
@@ -77,13 +76,13 @@ func (c *APIClient) Authenticate() error {
 	_, err := c.HTTPClient.New().Post("/identity/api/tokens").BodyJSON(params).
 		Receive(authRes, apiError)
 
-	if err != nil {
-		return err
-	}
-
 	if !apiError.isEmpty() {
 		log.Errorf("%s\n", apiError.Error())
 		return fmt.Errorf("%s", apiError.Error())
+	}
+
+	if err != nil {
+		return err
 	}
 
 	//Get a bearer token

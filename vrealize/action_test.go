@@ -10,7 +10,7 @@ import (
 
 //var client APIClient
 
-func init() {
+func initc() {
 	fmt.Println("init")
 	client = NewClient(
 		"admin@myvra.local",

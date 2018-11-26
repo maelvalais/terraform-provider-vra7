@@ -3,16 +3,17 @@ package vrealize
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"gopkg.in/jarcoal/httpmock.v1"
-	"testing"
 )
 
 var testProviders map[string]terraform.ResourceProvider
 var testProvider *schema.Provider
 
-func init() {
+func inita() {
 	testProvider = Provider().(*schema.Provider)
 	testProviders = map[string]terraform.ResourceProvider{
 		"vra7": testProvider,

@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+
+	"gopkg.in/jarcoal/httpmock.v1"
 )
 
-func init() {
+func initb() {
 	fmt.Println("init")
 	// These are mock test credentials
 	client = NewClient(

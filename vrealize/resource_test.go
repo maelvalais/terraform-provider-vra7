@@ -11,9 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
 	"github.com/vmware/terraform-provider-vra7/utils"
 
 	"gopkg.in/jarcoal/httpmock.v1"
@@ -164,57 +162,6 @@ func TestAPIClient_RequestCatalogItem(t *testing.T) {
 	if catalogRequest != nil {
 		t.Errorf("Catalog item request initiated successfully.")
 	}
-}
-
-func testNoop() resource.TestCheckFunc { return func(s *terraform.State) error { return nil } }
-
-func testFieldIsInteger() resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		field := "CentOS_6.3.cpu"
-		if reflect.ValueOf(resourceConfiguration[field]).Kind() != reflect.Int {
-			return fmt.Errorf("Field '%s' was expected to be an integer", field)
-		}
-		return nil
-	}
-}
-
-func TestAccExampleWidget_basic(t *testing.T) {
-	// rName := acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder("GET", "http://localhost/catalog-service/"+
-		"api/consumer/entitledCatalogItems/e5dd4fba-45ed-4943-b1fc-7f96239286be/requests/template",
-		httpmock.NewStringResponder(200, `{"type":"com.vmware.vcac.catalog.domain.request.CatalogItemProvisioningRequest","catalogItemId":"e5dd4fba-45ed-4943-b1fc-7f96239286be","requestedFor":"jason@corp.local","businessGroupId":"53619006-56bb-4788-9723-9eab79752cc1","description":null,"reasons":null,"data":{"CentOS_6.3":{"componentTypeId":"com.vmware.csp.component.cafe.composition","componentId":null,"classId":"Blueprint.Component.Declaration","typeFilter":"CentOS63*CentOS_6.3","data":{"_allocation":{"componentTypeId":"com.vmware.csp.iaas.blueprint.service","componentId":null,"classId":"Infrastructure.Compute.Machine.Allocation","typeFilter":null,"data":{"machines":[{"componentTypeId":"com.vmware.csp.iaas.blueprint.service","componentId":null,"classId":"Infrastructure.Compute.Machine.Allocation.Machine","typeFilter":null,"data":{"machine_id":"","nics":[{"componentTypeId":"com.vmware.csp.iaas.blueprint.service","componentId":null,"classId":"Infrastructure.Compute.Machine.Nic","typeFilter":null,"data":{"address":"","assignment_type":"Static","external_address":"","id":null,"load_balancing":null,"network":null,"network_profile":null}}]}}]}},"_cluster":1,"_hasChildren":false,"cpu":1,"datacenter_location":null,"description":"Basic IaaS CentOS Machine","disks":[{"componentTypeId":"com.vmware.csp.iaas.blueprint.service","componentId":null,"classId":"Infrastructure.Compute.Machine.MachineDisk","typeFilter":null,"data":{"capacity":3,"custom_properties":null,"id":1450725224066,"initial_location":"","is_clone":true,"label":"Hard disk 1","storage_reservation_policy":"","userCreated":false,"volumeId":0}}],"guest_customization_specification":"CentOS","max_network_adapters":-1,"max_per_user":0,"max_volumes":60,"memory":512,"nics":null,"os_arch":"x86_64","os_distribution":null,"os_type":"Linux","os_version":null,"property_groups":null,"reservation_policy":null,"security_groups":[],"security_tags":[],"storage":3}},"_archiveDays":5,"_leaseDays":null,"_number_of_instances":1,"corp192168110024":{"componentTypeId":"com.vmware.csp.component.cafe.composition","componentId":null,"classId":"Blueprint.Component.Declaration","typeFilter":"CentOS63*corp192168110024","data":{"_hasChildren":false}}}}`))
-
-	resource.Test(t, resource.TestCase{
-		PreCheck: func() {},
-		Providers: map[string]terraform.ResourceProvider{
-			"vra7_resource": Provider(),
-		},
-		CheckDestroy: testNoop(),
-		Steps: []resource.TestStep{
-			{
-				Config: `
-				  provider  "vra7" {
-					username = "a"
-					password  = "a"
-					tenant = "a"
-					host = "a"
-				  }
-				  resource "vra7_resource" "resource_1" {
-					count            = 1
-					catalog_id = "e5dd4fba-45ed-4943-b1fc-7f96239286be"
-					resource_configuration = {
-					  CentOS_6.3.cpu = "2"
-					}
-				  }`,
-				Check: resource.ComposeTestCheckFunc(
-					testFieldIsInteger(),
-				),
-			},
-		},
-	})
 }
 
 func TestAPIClient_GetResourceViews(t *testing.T) {
