@@ -4,9 +4,11 @@ variables:
   DEP_VERSION: 0.3.2
 
 job:
+  tags: [docker]
   before_script:
     # Download the binary to bin folder in $GOPATH
-    - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
+    - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 > $GOPATH/bin/dep
+    - echo "322152b8b50b26e5e3a7f6ebaeb75d9c11a747e64bbfd0d8bb1f4d89a031c2b5  $GOPATH/bin/dep" | sha256sum -c
     # Make the binary executable
     - chmod +x $GOPATH/bin/dep
     - go get -u golang.org/x/lint/golint
