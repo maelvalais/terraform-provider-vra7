@@ -194,7 +194,7 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 				} else if value.(string) == "0" || value.(string) == "false" {
 					requestTemplate.Data[field1] = false
 				} else {
-					log.Error(fmt.Sprintf("boolean expected for field '%v'. String is '%v'", field1, value))
+					log.Errorf("boolean expected for field '%v'. String is '%v'", field1, value)
 					panic(fmt.Sprintf("boolean expected for field '%v'. String is '%v'", field1, value))
 				}
 			}
@@ -206,7 +206,7 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 				if i, err := strconv.Atoi(str); err == nil {
 					requestTemplate.Data[field1] = i
 				} else {
-					log.Error(fmt.Sprintf("integer expected for field '%v'. String is '%v'", field1, str))
+					log.Errorf("integer expected for field '%v'. String is '%v'", field1, str)
 					panic(fmt.Sprintf("integer expected for field '%v'. String is '%v'", field1, str))
 				}
 			}
@@ -731,7 +731,7 @@ func (vRAClient *APIClient) RequestCatalogItem(requestTemplate *CatalogItemReque
 
 	jsonBody, jErr := json.Marshal(requestTemplate)
 	if jErr != nil {
-		log.Error("Error marshalling request templat as JSON")
+		log.Errorf("Error marshalling request templat as JSON")
 		return nil, jErr
 	}
 
@@ -808,7 +808,7 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 	}
 	// there are invalid resource config keys in the terraform config file, abort and throw an error
 	if len(invalidKeys) > 0 {
-		log.Error("The resource_configuration in the config file has invalid component name(s): %v (should be one of: %v)", strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
+		log.Errorf("The resource_configuration in the config file has invalid component name(s): %v (should be one of: %v)", strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
 		//return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
 	}
 	return nil
@@ -845,7 +845,7 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 
 	// if both catalog item name and id are provided but does not belong to the same catalog item, throw an error
 	if len(catalogItemName) > 0 && len(catalogItemID) > 0 && (catalogItemIdFromName != catalogItemID || catalogItemNameFromId != catalogItemName) {
-		log.Error("The catalog item name %s and id %s does not belong to the same catalog item. Provide either name or id.")
+		log.Errorf("The catalog item name %s and id %s does not belong to the same catalog item. Provide either name or id.")
 		return nil, errors.New("The catalog item name %s and id %s does not belong to the same catalog item. Provide either name or id.")
 	} else if len(catalogItemID) > 0 { // else if both are provided and matches or just id is provided, use id
 		d.Set(utils.CATALOG_ID, catalogItemID)
@@ -880,7 +880,7 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 
 	//if both business group name and id are provided but does not belong to the same business group, throw an error
 	if len(businessGroupName) > 0 && len(businessGroupId) > 0 && businessGroupIdFromName != businessGroupId {
-		log.Error("The business group name %s and id %s does not belong to the same business group. Provide either name or id.", businessGroupName, businessGroupId)
+		log.Errorf("The business group name %s and id %s does not belong to the same business group. Provide either name or id.", businessGroupName, businessGroupId)
 		return nil, errors.New(fmt.Sprintf("The business group name %s and id %s does not belong to the same business group. Provide either name or id.", businessGroupName, businessGroupId))
 	} else if len(businessGroupId) > 0 { // else if both are provided and matches or just id is provided, use id
 		log.Infof("Setting business group id %s ", businessGroupId)
@@ -910,7 +910,7 @@ func waitForRequestCompletion(d *schema.ResourceData, meta interface{}) error {
 			log.Infof("Resource creation SUCCESSFUL.")
 			return nil
 		} else if request_status == utils.FAILED {
-			log.Error("Request Failed with message %v ", d.Get(utils.FAILED_MESSAGE))
+			log.Errorf("Request Failed with message %v ", d.Get(utils.FAILED_MESSAGE))
 			//If request is failed during the time then
 			//unset resource details from state.
 			d.SetId("")
