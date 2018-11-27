@@ -1,17 +1,19 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
 variables:
-  DEP_VERSION: 0.3.2
+  GO111MODULE: on
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
   # http://devops-store.rd.francetelecom.fr/en/dos?page_id=6538
   tags: [docker, shared, innovation]
   before_script:
-    - go get -u github.com/golang/dep/cmd/dep
-    - dep version
     - go get -u golang.org/x/lint/golint
+    - CI_PROJECT_DIR=/go/src/${CI_PROJECT_URL/http?:\/\//}
+    - mkdir -p $CI_PROJECT_DIR
+    - mv $PWD/{*,.*} $CI_PROJECT_DIR
+    - cd $CI_PROJECT_DIR
 
   script:
-    - dep ensure
+    - go get
     - make check race release
