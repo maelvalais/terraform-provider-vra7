@@ -10,7 +10,7 @@ import (
 
 //var client APIClient
 
-func initc() {
+func initActionTest() {
 	fmt.Println("init")
 	client = NewClient(
 		"admin@myvra.local",
@@ -147,6 +147,7 @@ var resourceViewsResp = `{"links":[],"content":[{"@type":"CatalogResourceView","
 var catalogItemId = "666d77e3-7642-492d-aad1-82b8edd30e56"
 
 func TestPowerOffAction(t *testing.T) {
+	initActionTest()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 

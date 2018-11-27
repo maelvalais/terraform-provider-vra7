@@ -13,7 +13,7 @@ import (
 var testProviders map[string]terraform.ResourceProvider
 var testProvider *schema.Provider
 
-func inita() {
+func initProviderTest() {
 	testProvider = Provider().(*schema.Provider)
 	testProviders = map[string]terraform.ResourceProvider{
 		"vra7": testProvider,
@@ -50,6 +50,7 @@ func inita() {
 }
 
 func TestValidateProvider(t *testing.T) {
+	initProviderTest()
 	httpmock.RegisterResponder("POST", "http://localhost/identity/api/tokens",
 		httpmock.NewErrorResponder(errors.New(`{"errors":[{"code":90135,"source":null,"message":"Unable to authenticate user jason@corp.local1 in tenant vsphere.local.","systemMessage":"90135-Unable to authenticate user jason@corp.local1 in tenant vsphere.local.","moreInfoUrl":null}]}`)))
 
@@ -60,6 +61,7 @@ func TestValidateProvider(t *testing.T) {
 }
 
 func TestProvider(t *testing.T) {
+	initProviderTest()
 	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}

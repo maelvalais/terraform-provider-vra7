@@ -8,7 +8,7 @@ import (
 	"gopkg.in/jarcoal/httpmock.v1"
 )
 
-func initb() {
+func initCatalogTest() {
 	fmt.Println("init")
 	// These are mock test credentials
 	client = NewClient(
@@ -61,6 +61,7 @@ var catalogItemTemplateResp = `{"catalogItem":{"callbacks":null,"catalogItemType
 "tenantLabel":"vsphere.local","subtenantRef":"53619006-56bb-4788-9723-9eab79752cc1","subtenantLabel":"Content"}]}`
 
 func TestFetchCatalogItemByName(t *testing.T) {
+	initCatalogTest()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -164,6 +165,7 @@ func TestFetchCatalogItemByName(t *testing.T) {
 // 1) Fetch catalog item details using correct catalog item ID
 // 2) Fetch catalog item details with invalid catalog item ID
 func TestFetchCatalogItemByID(t *testing.T) {
+	initCatalogTest()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 	httpmock.RegisterResponder("GET", "http://localhost/catalog-service/api/consumer/entitledCatalogItems/"+catalogItemId1,
