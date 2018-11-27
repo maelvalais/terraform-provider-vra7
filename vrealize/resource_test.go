@@ -239,7 +239,7 @@ func TestAPIClient_destroyMachine(t *testing.T) {
 	getActionTemplatePath := "http://localhost/catalog-service/api/consumer/resources/ea68a707-bd35-4765-a1fc-16aca56ff844/actions/356d45a1-d30e-4def-86c9-10cb9aa2b0de/requests/template"
 	response, err := client.HTTPClient.New().Get(getActionTemplatePath).
 		Receive(resourceActionTemplate, apiError)
-	log.Info("inside test resource action template : %v ", resourceActionTemplate)
+	log.Infof("inside test resource action template : %v ", resourceActionTemplate)
 	response.Close = true
 
 	if err != nil {

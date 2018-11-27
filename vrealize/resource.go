@@ -96,8 +96,8 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 			nonComponentNameList = append(nonComponentNameList, field)
 		}
 	}
-	log.Info("createResource->key_list (<component>.<property> in resource_configuration) %v\n", componentNameList)
-	log.Info("createResource->key_list (direct <properties> in resource_configuration) %v\n", nonComponentNameList)
+	log.Infof("createResource->key_list (<component>.<property> in resource_configuration) %v\n", componentNameList)
+	log.Infof("createResource->key_list (direct <properties> in resource_configuration) %v\n", nonComponentNameList)
 
 	// Arrange component names in descending order of text length.
 	// Component names are sorted this way because '.', which is used as a separator, may also occur within
@@ -198,7 +198,7 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 					panic(fmt.Sprintf("boolean expected for field '%v'. String is '%v'", field1, value))
 				}
 			}
-			log.Info("BOOL: %v = %v is %T", field1, requestTemplate.Data[field1], requestTemplate.Data[field1])
+			log.Infof("BOOL: %v = %v is %T", field1, requestTemplate.Data[field1], requestTemplate.Data[field1])
 		// integers
 		case "lease",
 			"targetDiskSizeOfVm":
@@ -211,19 +211,19 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 				}
 			}
 
-			log.Info("INT: %v = %v is %v", field1, requestTemplate.Data[field1], reflect.ValueOf(requestTemplate.Data[field1]).Kind().String)
+			log.Infof("INT: %v = %v is %v", field1, requestTemplate.Data[field1], reflect.ValueOf(requestTemplate.Data[field1]).Kind().String)
 		case "reasons",
 			"description":
 			// Do nothing
 		default:
-			log.Info("unknown option [%s] with value [%s] ignoring\n", field1, resourceConfiguration[field1])
+			log.Infof("unknown option [%s] with value [%s] ignoring\n", field1, resourceConfiguration[field1])
 		}
 	}
 	// for _, field1 := range nonComponentNameList {
 	// 	requestTemplate.Data[field1] = resourceConfiguration[field1]
 	// }
 	for _, propertyName := range nonComponentNameList {
-		log.Info("Type of %v: %T (value: %v)", propertyName, requestTemplate.Data[propertyName], requestTemplate.Data[propertyName])
+		log.Infof("Type of %v: %T (value: %v)", propertyName, requestTemplate.Data[propertyName], requestTemplate.Data[propertyName])
 	}
 
 	// Add the catalog_configuration ('description', 'reasons'...)
@@ -241,11 +241,11 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 		case "reasons":
 			requestTemplate.Reasons = depValue.(string)
 		default:
-			log.Info("unknown option [%s] with value [%s] ignoring\n", depField, depValue)
+			log.Infof("unknown option [%s] with value [%s] ignoring\n", depField, depValue)
 		}
 	}
 
-	log.Info("Updated template - %v\n", requestTemplate.Data)
+	log.Infof("Updated template - %v\n", requestTemplate.Data)
 
 	//Fire off a catalog item request to create a deployment.
 	catalogRequest, err := vRAClient.RequestCatalogItem(requestTemplate)
@@ -337,9 +337,9 @@ func updateResource(d *schema.ResourceData, meta interface{}) error {
 							}
 							resourceActionTemplate := new(ResourceActionTemplate)
 							apiError := new(APIError)
-							log.Info("Retrieving reconfigure action template for the component: %v ", componentName)
+							log.Infof("Retrieving reconfigure action template for the component: %v ", componentName)
 							getActionTemplatePath := fmt.Sprintf(utils.GET_ACTION_TEMPLATE_API, resources.Id, reconfigureActionId)
-							log.Info("Call GET to fetch the reconfigure action template %v ", getActionTemplatePath)
+							log.Infof("Call GET to fetch the reconfigure action template %v ", getActionTemplatePath)
 							response, err := vRAClient.HTTPClient.New().Get(getActionTemplatePath).
 								Receive(resourceActionTemplate, apiError)
 							response.Close = true
@@ -417,7 +417,7 @@ func readResource(d *schema.ResourceData, meta interface{}) error {
 	// Get the ID of the catalog request that was used to provision this Deployment.
 	catalogItemRequestID := d.Id()
 
-	log.Info("Calling read resource to get the current resource status of the request: %v ", catalogItemRequestID)
+	log.Infof("Calling read resource to get the current resource status of the request: %v ", catalogItemRequestID)
 	// Get client handle
 	vRAClient := meta.(*APIClient)
 	// Get requested status
@@ -445,7 +445,7 @@ func readResource(d *schema.ResourceData, meta interface{}) error {
 	for _, resource := range requestResourceView.Content {
 		if resource.ResourceType == utils.INFRASTRUCTURE_VIRTUAL {
 			resourceData := resource.ResourcesData
-			log.Info("The resource data map of the resource %v is: \n%v", resourceData.Component, resource.ResourcesData)
+			log.Infof("The resource data map of the resource %v is: \n%v", resourceData.Component, resource.ResourcesData)
 			dataVals := make(map[string]interface{})
 			resourceDataMap[resourceData.Component] = dataVals
 			dataVals[utils.MACHINE_CPU] = resourceData.Cpu
@@ -481,7 +481,7 @@ func readResource(d *schema.ResourceData, meta interface{}) error {
 // if there is difference between the config data and deployment data, return true
 func updateResourceConfigurationMap(
 	resourceConfiguration map[string]interface{}, vmData map[string]map[string]interface{}) (map[string]interface{}, bool) {
-	log.Info("Updating resource configuration with the request resource view data...")
+	log.Infof("Updating resource configuration with the request resource view data...")
 	var changed bool
 	for configKey1, configValue1 := range resourceConfiguration {
 		for configKey2, configValue2 := range vmData {
@@ -530,7 +530,7 @@ func deleteResource(d *schema.ResourceData, meta interface{}) error {
 	if len(d.Id()) == 0 {
 		return fmt.Errorf("Resource not found")
 	}
-	log.Info("Calling delete resource for the request id %v ", catalogItemRequestID)
+	log.Infof("Calling delete resource for the request id %v ", catalogItemRequestID)
 
 	ResourceActions := new(ResourceActions)
 	apiError := new(APIError)
@@ -568,7 +568,7 @@ func deleteResource(d *schema.ResourceData, meta interface{}) error {
 				resourceActionTemplate := new(ResourceActionTemplate)
 				apiError := new(APIError)
 				getActionTemplatePath := fmt.Sprintf(utils.GET_ACTION_TEMPLATE_API, resources.Id, destroyActionID)
-				log.Info("GET %v to fetch the destroy action template for the resource %v ", getActionTemplatePath, resources.Id)
+				log.Infof("GET %v to fetch the destroy action template for the resource %v ", getActionTemplatePath, resources.Id)
 				response, err := vRAClient.HTTPClient.New().Get(getActionTemplatePath).
 					Receive(resourceActionTemplate, apiError)
 				response.Close = true
@@ -594,7 +594,7 @@ func deleteResource(d *schema.ResourceData, meta interface{}) error {
 	sleepFor := d.Get(utils.REFRESH_SECONDS).(int)
 	for i := 0; i < waitTimeout/sleepFor; i++ {
 		time.Sleep(time.Duration(sleepFor) * time.Second)
-		log.Info("Checking to see if resource is deleted.")
+		log.Infof("Checking to see if resource is deleted.")
 		deploymentStateData, err := vRAClient.GetDeploymentState(catalogItemRequestID)
 		if err != nil {
 			return fmt.Errorf("Resource view failed to load:  %v", err)
@@ -735,7 +735,7 @@ func (vRAClient *APIClient) RequestCatalogItem(requestTemplate *CatalogItemReque
 		return nil, jErr
 	}
 
-	log.Info("JSON Request Info: %s", string(jsonBody))
+	log.Infof("JSON Request Info: %s", string(jsonBody))
 	//Set a REST call to create a machine
 	_, err := vRAClient.HTTPClient.New().Post(path).BodyJSON(requestTemplate).
 		Receive(catalogRequest, apiError)
@@ -762,7 +762,7 @@ func KeysString(m map[string]interface{}) string {
 
 // check if the resource configuration is valid in the terraform config file
 func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) error {
-	log.Info("Checking if the terraform config file is valid")
+	log.Infof("Checking if the terraform config file is valid")
 
 	// Get all component names in the blueprint corresponding to the catalog item.
 	componentSet := make(map[string]bool)
@@ -776,7 +776,7 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 		}
 	}
 
-	log.Info(fmt.Sprint("The component name(s) in the blueprint corresponding to the catalog item: ", componentSet))
+	log.Infof("The component name(s) in the blueprint corresponding to the catalog item: ", componentSet)
 
 	var invalidKeys []string
 	// check if the keys in the resourceConfiguration map exists in the componentSet
@@ -790,7 +790,7 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 			lastIndex := strings.LastIndex(key, ".")
 			key = key[0:lastIndex]
 			if _, ok := componentSet[key]; ok {
-				log.Info("The component name %s in the terraform config file is valid ", key)
+				log.Infof("The component name %s in the terraform config file is valid ", key)
 				isValid = true
 				break
 			}
@@ -799,7 +799,7 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 		// is directly at the toplevel.
 
 		if _, ok := noncomponentSet[field]; ok {
-			log.Info("The resource_configuration field '%s' is supposed to be a component (e.g., Machine1 in Machine1.cpu) but found a matching field '%s' in the template data", field, field)
+			log.Infof("The resource_configuration field '%s' is supposed to be a component (e.g., Machine1 in Machine1.cpu) but found a matching field '%s' in the template data", field, field)
 			isValid = true
 		}
 		if !isValid {
@@ -831,7 +831,7 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 		if err != nil || catalogItemIdFromName == "" {
 			return nil, fmt.Errorf("Error in finding catalog item id corresponding to the catlog item name %v: \n %v", catalogItemName, err)
 		}
-		log.Info("The catalog item id provided in the config is %v\n", catalogItemIdFromName)
+		log.Infof("The catalog item id provided in the config is %v\n", catalogItemIdFromName)
 	}
 
 	// if catalog item name is provided, fetch the catalog item id
@@ -840,7 +840,7 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 		if err != nil || catalogItemNameFromId == "" {
 			return nil, fmt.Errorf("Error in finding catalog item name corresponding to the catlog item id %v: \n %v", catalogItemID, err)
 		}
-		log.Info("The catalog item name corresponding to the catalog item id in the config is:  %v\n", catalogItemNameFromId)
+		log.Infof("The catalog item name corresponding to the catalog item id in the config is:  %v\n", catalogItemNameFromId)
 	}
 
 	// if both catalog item name and id are provided but does not belong to the same catalog item, throw an error
@@ -883,10 +883,10 @@ func checkConfigValuesValidity(vRAClient *APIClient, d *schema.ResourceData) (*C
 		log.Error("The business group name %s and id %s does not belong to the same business group. Provide either name or id.", businessGroupName, businessGroupId)
 		return nil, errors.New(fmt.Sprintf("The business group name %s and id %s does not belong to the same business group. Provide either name or id.", businessGroupName, businessGroupId))
 	} else if len(businessGroupId) > 0 { // else if both are provided and matches or just id is provided, use id
-		log.Info("Setting business group id %s ", businessGroupId)
+		log.Infof("Setting business group id %s ", businessGroupId)
 		requestTemplate.BusinessGroupID = businessGroupId
 	} else if len(businessGroupName) > 0 { // else if name is provided, use the id fetched from the name
-		log.Info("Setting business group id %s for the group %s ", businessGroupIdFromName, businessGroupName)
+		log.Infof("Setting business group id %s for the group %s ", businessGroupIdFromName, businessGroupName)
 		requestTemplate.BusinessGroupID = businessGroupIdFromName
 	}
 	return requestTemplate, nil
@@ -899,15 +899,15 @@ func waitForRequestCompletion(d *schema.ResourceData, meta interface{}) error {
 	sleepFor := d.Get(utils.REFRESH_SECONDS).(int)
 	request_status := ""
 	for i := 0; i < waitTimeout/sleepFor; i++ {
-		log.Info("Waiting for %d seconds before checking request status.", sleepFor)
+		log.Infof("Waiting for %d seconds before checking request status.", sleepFor)
 		time.Sleep(time.Duration(sleepFor) * time.Second)
 
 		readResource(d, meta)
 
 		request_status = d.Get(utils.REQUEST_STATUS).(string)
-		log.Info("Checking to see if resource is created. Status: %s.", request_status)
+		log.Infof("Checking to see if resource is created. Status: %s.", request_status)
 		if request_status == utils.SUCCESSFUL {
-			log.Info("Resource creation SUCCESSFUL.")
+			log.Infof("Resource creation SUCCESSFUL.")
 			return nil
 		} else if request_status == utils.FAILED {
 			log.Error("Request Failed with message %v ", d.Get(utils.FAILED_MESSAGE))
@@ -916,9 +916,9 @@ func waitForRequestCompletion(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return fmt.Errorf("Request failed \n %v ", d.Get(utils.FAILED_MESSAGE))
 		} else if request_status == utils.IN_PROGRESS {
-			log.Info("Resource creation is still IN PROGRESS.")
+			log.Infof("Resource creation is still IN PROGRESS.")
 		} else {
-			log.Info("Resource creation request status: %s.", request_status)
+			log.Infof("Resource creation request status: %s.", request_status)
 		}
 	}
 
@@ -931,7 +931,7 @@ func waitForRequestCompletion(d *schema.ResourceData, meta interface{}) error {
 func (vRAClient *APIClient) GetBusinessGroupId(businessGroupName string) (string, error) {
 
 	path := "/identity/api/tenants/" + vRAClient.Tenant + "/subtenants?%24filter=name+eq+'" + businessGroupName + "'"
-	log.Info("Fetching business group id from name..GET %s ", path)
+	log.Infof("Fetching business group id from name..GET %s ", path)
 	BusinessGroups := new(BusinessGroups)
 	apiError := new(APIError)
 	_, err := vRAClient.HTTPClient.New().Get(path).Receive(BusinessGroups, apiError)
@@ -950,23 +950,23 @@ func (vRAClient *APIClient) GetBusinessGroupId(businessGroupName string) (string
 // read the config file
 func readProviderConfiguration(d *schema.ResourceData) {
 
-	log.Info("Reading the provider configuration data.....")
+	log.Infof("Reading the provider configuration data.....")
 	catalogItemName = strings.TrimSpace(d.Get(utils.CATALOG_NAME).(string))
-	log.Info("Catalog item name: %v ", catalogItemName)
+	log.Infof("Catalog item name: %v ", catalogItemName)
 	catalogItemID = strings.TrimSpace(d.Get(utils.CATALOG_ID).(string))
-	log.Info("Catalog item ID: %v", catalogItemID)
+	log.Infof("Catalog item ID: %v", catalogItemID)
 	businessGroupName = strings.TrimSpace(d.Get(utils.BUSINESS_GROUP_NAME).(string))
-	log.Info("Business Group name: %v", businessGroupName)
+	log.Infof("Business Group name: %v", businessGroupName)
 	businessGroupId = strings.TrimSpace(d.Get(utils.BUSINESS_GROUP_ID).(string))
-	log.Info("Business Group Id: %v", businessGroupId)
+	log.Infof("Business Group Id: %v", businessGroupId)
 	waitTimeout = d.Get(utils.WAIT_TIME_OUT).(int) * 60
-	log.Info("Wait time out: %v ", waitTimeout)
+	log.Infof("Wait time out: %v ", waitTimeout)
 	failedMessage = strings.TrimSpace(d.Get(utils.FAILED_MESSAGE).(string))
-	log.Info("Failed message: %v ", failedMessage)
+	log.Infof("Failed message: %v ", failedMessage)
 	resourceConfiguration = d.Get(utils.RESOURCE_CONFIGURATION).(map[string]interface{})
-	log.Info("Resource Configuration: %v ", resourceConfiguration)
+	log.Infof("Resource Configuration: %v ", resourceConfiguration)
 	deploymentConfiguration = d.Get(utils.DEPLOYMENT_CONFIGURATION).(map[string]interface{})
-	log.Info("Deployment Configuration: %v ", deploymentConfiguration)
+	log.Infof("Deployment Configuration: %v ", deploymentConfiguration)
 	catalogConfiguration = d.Get(utils.CATALOG_CONFIGURATION).(map[string]interface{})
-	log.Info("Catalog configuration: %v ", catalogConfiguration)
+	log.Infof("Catalog configuration: %v ", catalogConfiguration)
 }

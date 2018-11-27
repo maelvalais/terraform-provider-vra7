@@ -34,7 +34,7 @@ func (c *APIClient) GetCatalogItemRequestTemplate(catalogItemId string) (*Catalo
 		"%s/requests/template",
 		catalogItemId)
 
-	log.Info("GetCatalogItemRequestTemplate->path %v\n", path)
+	log.Infof("GetCatalogItemRequestTemplate->path %v\n", path)
 
 	requestTemplate := new(CatalogItemRequestTemplate)
 	apiError := new(APIError)
@@ -49,7 +49,7 @@ func (c *APIClient) GetCatalogItemRequestTemplate(catalogItemId string) (*Catalo
 		return nil, apiError
 	}
 	//Return catalog item template
-	log.Info("GetCatalogItemRequestTemplate->requestTemplate %v\n", requestTemplate)
+	log.Infof("GetCatalogItemRequestTemplate->requestTemplate %v\n", requestTemplate)
 	return requestTemplate, nil
 }
 
@@ -90,7 +90,7 @@ func (c *APIClient) readCatalogItemNameByID(catalogItemID string) (string, error
 func (c *APIClient) readCatalogItemIDByName(catalogName string) (string, error) {
 	var catalogItemID string
 
-	log.Info("readCatalogItemIdByName->catalog_name %v\n", catalogName)
+	log.Infof("readCatalogItemIdByName->catalog_name %v\n", catalogName)
 
 	//Set a call to read number of catalogs from vRA
 	path := fmt.Sprintf("catalog-service/api/consumer/entitledCatalogItemViews")
