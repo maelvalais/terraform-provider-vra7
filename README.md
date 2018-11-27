@@ -4,6 +4,12 @@ My goal with this fork is to _adapt_ the upstream project
 [terraform-provider-vra7] to the non-conventional ways BRMC is implementing XaaS
 blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
 
+- Right now, I get an error after 15 minutes after posting the request:
+
+      PROVIDER_FAILED (Workflow:Wait for resource action request / Extract result (item3)#11)
+
+  No idea why, this error also happens when creating a VM from the web client.
+
 - One field in the returned catalog item template is missing, which makes it
   hard to guess that it is needed when the error messages returned by vRA are so
   cryptic, e.g., for `bgName` missing, it was:
