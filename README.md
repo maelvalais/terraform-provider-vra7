@@ -1,5 +1,92 @@
-# VMware Terraform provider for vRealize Automation 7
-[![Build Status](https://travis-ci.org/vmware/terraform-provider-vra7.svg?branch=master)](https://travis-ci.org/vmware/terraform-provider-vra7)
+# terraform-provider-vra7-brmc
+
+My goal with this fork is to _adapt_ the upstream project
+[terraform-provider-vra7] to the non-conventional ways BRMC is implementing XaaS
+blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
+
+- One field in the returned catalog item template is missing, which makes it
+  hard to guess that it is needed when the error messages returned by vRA are so
+  cryptic, e.g., for `bgName` missing, it was:
+
+      No domain name. Look for data binding in form (Workflow:Provision a VM / check values (item27)#1)
+
+- The BRMC team has chosen a weird layout for catalog item templates. In the
+  upstream [terraform-provided-vra], properties (cpu, codeBasicat...) are
+  expected to be wrapped into components, not directly properties in the
+  top-level "data" field. Here is what a template looks like in BRMC:
+
+  ```json
+  {
+    "type": "com.vmware.vcac.catalog.domain.request.CatalogItemProvisioningRequest",
+    "catalogItemId": "37d038c8-7a7c-41dd-9beb-0420c08fc815",
+    "requestedFor": "NLGN2101@ad.francetelecom.fr",
+    "businessGroupId": "21e6cf47-952d-4b67-9881-439af6388a41",
+    "description": null,
+    "reasons": null,
+    "data": {
+      "cpu": null,
+      "codeBasicat": null,
+      "cactusGroupNames": null,
+      "module_applicatif": null,
+      "AZ": null
+    }
+  }
+  ```
+
+  Instead, they should use components (i.e., `Platon_rehl73`):
+
+  ```json
+  {
+      "type": "com.vmware.vcac.catalog.domain.request.CatalogItemProvisioningRequest",
+      "catalogItemId": "37d038c8-7a7c-41dd-9beb-0420c08fc815",
+      "requestedFor": "NLGN2101@ad.francetelecom.fr",
+      "businessGroupId": "21e6cf47-952d-4b67-9881-439af6388a41",
+      "description": null,
+      "reasons": null,
+
+      "data": {
+          "Platon_rehl73": {
+              "componentTypeId": "...",
+              "componentId": null,
+              "classId": "Blueprint.Component.Declaration",
+              "typeFilter": "Platon_rehl73*Platon_rehl73",
+              "data": {
+                  "Cafe.Shim.VirtualMachine.MaxCost": 0,
+                  "Cafe.Shim.VirtualMachine.MinCost": 0,
+                  "_cluster": 1,
+                  "_hasChildren": false,
+                  "action": "FullClone",
+                  "allow_storage_policies": false,
+                  "archive_days": 0,
+                  "blueprint_type": "1",
+                  "cpu": 1,
+                  "custom_properties": [
+                      "codeBasicat": null,
+                      "cactusGroupNames": null,
+                      "module_applicatif": null,
+                      "AZ": null
+                  ]
+          ...
+      }
+  }
+  ```
+
+  This components/properties thing is explained in the upstream [terraform-provider-vra7] project
+  in [comments](https://github.com/vmware/terraform-provider-vra7/blob/88688609cd8d848c17cb124646f2d90709741c47/vrealize/resource.go#L109-L112):
+
+  ```go
+  // User-supplied resource configuration keys are expected to be of the form:
+  //     <component name>.<property name>.
+  // Extract the property names and values for each component in the blueprint, and add/update
+  // them in the right location in the request template.
+  ```
+
+- Unhelpful/cryptic error messages when provisionning fails or when the API call is wrong.
+  Try to guess what this one means:
+
+      PROVIDER_FAILED (Workflow:Wait for resource action request / Extract result (item3)#11)
+
+[terraform-provider-vra7]: https://github.com/vmware/terraform-provider-vra7
 
 A self-contained deployable integration between Terraform and vRealize Automation (vRA) which allows Terraform users to request/provision entitled vRA catalog items using Terraform. Supports Terraform destroying vRA provisioned resources.
 
@@ -10,9 +97,10 @@ These instructions will get you a copy of the project up and run on your local m
 ## Prerequisites
 
 To get the vRA plugin up and running you need the following things.
-* [Terraform 0.9 or above](https://www.terraform.io/downloads.html)
-* [Go Language 1.9.2 or above](https://golang.org/dl/)
-* [dep - new dependency management tool for Go](https://github.com/golang/dep)
+
+- [Terraform 0.9 or above](https://www.terraform.io/downloads.html)
+- [Go Language 1.9.2 or above](https://golang.org/dl/)
+- [dep - new dependency management tool for Go](https://github.com/golang/dep)
 
 ## Project Setup
 
@@ -32,24 +120,28 @@ Set following environment variables
 
 **Linux Users**
 
-*GOROOT is a golang library path*
+_GOROOT is a golang library path_
+
 ```
 export GOROOT=/usr/local/go
 ```
 
-*GOPATH is a path pointing toward the source code directory*
+_GOPATH is a path pointing toward the source code directory_
+
 ```
 export GOPATH=/home/<user>/TerraformPluginProject
 ```
 
 **Windows Users**
 
-*GOROOT is a golang library path*
+_GOROOT is a golang library path_
+
 ```
 set GOROOT=C:\Go
 ```
 
-*GOPATH is a path pointing toward the source code directory*
+_GOPATH is a path pointing toward the source code directory_
+
 ```
 set GOPATH=C:\TerraformPluginProject
 ```
@@ -58,7 +150,8 @@ set GOPATH=C:\TerraformPluginProject
 
 **Linux Users**
 
-Create *~/.terraformrc* and put following content in it.
+Create _~/.terraformrc_ and put following content in it.
+
 ```
     providers {
          vra7 = "/home/<USER>/TerraformPluginProject/bin/terraform-provider-vra7"
@@ -67,16 +160,18 @@ Create *~/.terraformrc* and put following content in it.
 
 **Windows Users**
 
-Create *%APPDATA%/terraform.rc* and put following content in it.
+Create _%APPDATA%/terraform.rc_ and put following content in it.
+
 ```
     providers {
          vra7 = "C:\\TerraformPluginProject\\bin\\terraform-provider-vra7.exe"
     }
 ```
 
-
 ## Installation
-Clone repo code into go project using *go get*
+
+Clone repo code into go project using _go get_
+
 ```
     go get github.com/vmware/terraform-provider-vra7
 
@@ -86,7 +181,7 @@ Clone repo code into go project using *go get*
 
 **Linux and MacOS Users**
 
-Navigate to */home/<USER>/TerraformPluginProject/src/github.com/vmware/terraform-provider-vra7* and run go build command to generate plugin binary
+Navigate to _/home/<USER>/TerraformPluginProject/src/github.com/vmware/terraform-provider-vra7_ and run go build command to generate plugin binary
 
 ```
     dep ensure
@@ -96,7 +191,7 @@ Navigate to */home/<USER>/TerraformPluginProject/src/github.com/vmware/terraform
 
 **Windows Users**
 
-Navigate to *C:\TerraformPluginProject\src\github.com\vmware\terraform-provider-vra7* and run go build command to generate plugin binary
+Navigate to _C:\TerraformPluginProject\src\github.com\vmware\terraform-provider-vra7_ and run go build command to generate plugin binary
 
 ```
     dep ensure
@@ -116,11 +211,11 @@ This part contains service provider details.
 
 Provider block contains four mandatory fields
 
-* **username** - *vRA portal username*
-* **password** - *vRA portal password*
-* **tenant** - *vRA portal tenant*
-* **host** - *End point of REST API*
-* **insecure** - *In case of self-signed certificates. Default value is false.*
+- **username** - _vRA portal username_
+- **password** - _vRA portal password_
+- **tenant** - _vRA portal tenant_
+- **host** - _End point of REST API_
+- **insecure** - _In case of self-signed certificates. Default value is false._
 
 Example
 
@@ -134,7 +229,6 @@ Example
     }
 
 ```
-
 
 ### Resource
 
@@ -154,26 +248,25 @@ The resource block contains mandatory and optional fields as follows:
 
 Mandatory:
 
-One of catalog\_name or catalog\_id must be specified in the resource configuration.
+One of catalog_name or catalog_id must be specified in the resource configuration.
 
-* **catalog_name** - *catalog_name is a field which contains valid catalog name from your vRA*
+- **catalog_name** - _catalog_name is a field which contains valid catalog name from your vRA_
 
-* **catalog_id** - *catalog_id is a field which contains a valid catalog id from your vRA.* 
+- **catalog_id** - _catalog_id is a field which contains a valid catalog id from your vRA._
 
 Optional:
 
-* **businessgroup_id** - *This is an optional field. You can specify a different Business Group ID from what provided by default in the template reques, provided that your account is allowed to do it*
+- **businessgroup_id** - _This is an optional field. You can specify a different Business Group ID from what provided by default in the template reques, provided that your account is allowed to do it_
 
-* **catalog_configuration** - *This is an optional field. If catalog properties have default values or no mandatory user input required for catalog service then you can skip this field from the terraform configuration file. This field contains user inputs to catalog services. Value of this field is a key value pair. Key is any field name of catalog and value is any valid user input to the respective field.*
+- **catalog_configuration** - _This is an optional field. If catalog properties have default values or no mandatory user input required for catalog service then you can skip this field from the terraform configuration file. This field contains user inputs to catalog services. Value of this field is a key value pair. Key is any field name of catalog and value is any valid user input to the respective field._
 
-* **count** - *This field is used to create replicas of resources. If count is not provided then it will be considered as 1 by default.*
+- **count** - _This field is used to create replicas of resources. If count is not provided then it will be considered as 1 by default._
 
-* **deployment_configuration** - *This is an optional field. Can only be used to  specify the description or reasons field at the deployment level.  Key is any field name of catalog and value is any valid user input to the respective field.*
+- **deployment_configuration** - _This is an optional field. Can only be used to specify the description or reasons field at the deployment level. Key is any field name of catalog and value is any valid user input to the respective field._
 
-* **resource_configuration** - *This is an optional field. If blueprint properties have default values or no mandatory property value is required then you can skip this field from terraform configuration file. This field contains user inputs to catalog services. Value of this field is in key value pair. Key is service.field_name and value is any valid user input to the respective field.*
+- **resource_configuration** - _This is an optional field. If blueprint properties have default values or no mandatory property value is required then you can skip this field from terraform configuration file. This field contains user inputs to catalog services. Value of this field is in key value pair. Key is service.field_name and value is any valid user input to the respective field._
 
-* **wait_timeout** - *This is an optional field with a default value of 15. It defines the time to wait (in minutes) for a resource operation to complete successfully.*
-
+- **wait_timeout** - _This is an optional field with a default value of 15. It defines the time to wait (in minutes) for a resource operation to complete successfully._
 
 Example 1
 
@@ -219,17 +312,18 @@ Save this configuration in main.tf in a path where the binary is placed.
 ## Execution
 
 These are the Terraform commands that can be used for the vRA plugin:
-* **terraform init** - *The init command is used to initialize a working directory containing Terraform configuration files.*
 
-* **terraform plan** - *Plan command shows plan for resources like how many resources will be provisioned and how many will be destroyed.*
+- **terraform init** - _The init command is used to initialize a working directory containing Terraform configuration files._
 
-* **terraform apply** - *apply is responsible to execute actual calls to provision resources.*
+- **terraform plan** - _Plan command shows plan for resources like how many resources will be provisioned and how many will be destroyed._
 
-* **terraform refresh** - *By using the refresh command you can check the status of the request.*
+- **terraform apply** - _apply is responsible to execute actual calls to provision resources._
 
-* **terraform show** - *show will set a console output for resource configuration and request status.*
+- **terraform refresh** - _By using the refresh command you can check the status of the request._
 
-* **terraform destroy** - *destroy command will destroy all the  resources present in terraform configuration file.*
+- **terraform show** - _show will set a console output for resource configuration and request status._
+
+- **terraform destroy** - _destroy command will destroy all the resources present in terraform configuration file._
 
 Navigate to the location where main.tf and binary are placed and use the above commands as needed.
 
