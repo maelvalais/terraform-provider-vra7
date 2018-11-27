@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/vmware/terraform-provider-vra7/utils"
+	"gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7/utils"
 
 	"gopkg.in/jarcoal/httpmock.v1"
 )

@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/op/go-logging"
-	"github.com/vmware/terraform-provider-vra7/utils"
+	"gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7/utils"
 )
 
 var (
@@ -88,6 +88,7 @@ func createResource(d *schema.ResourceData, meta interface{}) error {
 	// Get all component names in the blueprint corresponding to the catalog item.
 	var componentNameList []string
 	var nonComponentNameList []string
+	nonComponentNameList = append(nonComponentNameList, "bgName")
 	for field := range requestTemplate.Data {
 		if reflect.ValueOf(requestTemplate.Data[field]).Kind() == reflect.Map {
 			componentNameList = append(componentNameList, field)
@@ -806,10 +807,10 @@ func checkResourceConfigValidity(requestTemplate *CatalogItemRequestTemplate) er
 		}
 	}
 	// there are invalid resource config keys in the terraform config file, abort and throw an error
-	// if len(invalidKeys) > 0 {
-	// 	log.Error("The resource_configuration in the config file has invalid component name(s): %v ", strings.Join(invalidKeys, ", "))
-	// 	return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
-	// }
+	if len(invalidKeys) > 0 {
+		log.Error("The resource_configuration in the config file has invalid component name(s): %v (should be one of: %v)", strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
+		//return fmt.Errorf(utils.CONFIG_INVALID_ERROR, strings.Join(invalidKeys, ", "), KeysString(requestTemplate.Data))
+	}
 	return nil
 }
 
