@@ -1,7 +1,11 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
+# Secret variables stored on Gitlab CI:
+# VRA_KEY, VRA_SECRET
+
 variables:
   GO111MODULE: on
+  TF_ACC: 1 # WARNING: 'go test' will create actual resources on BRMC
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
