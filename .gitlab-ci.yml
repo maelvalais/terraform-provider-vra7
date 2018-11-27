@@ -1,6 +1,6 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
-varibles:
+variables:
   DEP_VERSION: 0.3.2
 
 job:
