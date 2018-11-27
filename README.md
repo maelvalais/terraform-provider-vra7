@@ -33,7 +33,7 @@ blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
   }
   ```
 
-  Instead, they should use components (i.e., `Platon_rehl73`):
+  Instead, they should use components, e.g., `Platon_rehl73`:
 
   ```json
   {
@@ -71,6 +71,8 @@ blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
   }
   ```
 
+  (Note: this example comes from the [vra-75-programming-guide], page 51)
+
   This components/properties thing is explained in the upstream [terraform-provider-vra7] project
   in [comments](https://github.com/vmware/terraform-provider-vra7/blob/88688609cd8d848c17cb124646f2d90709741c47/vrealize/resource.go#L109-L112):
 
@@ -87,6 +89,7 @@ blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
       PROVIDER_FAILED (Workflow:Wait for resource action request / Extract result (item3)#11)
 
 [terraform-provider-vra7]: https://github.com/vmware/terraform-provider-vra7
+[vra-75-programming-guide]: https://vdc-download.vmware.com/vmwb-repository/dcr-public/3f9ab622-499d-4caf-801b-2a6c1f83a6d4/ba2d7e2c-3320-4dfb-9ef0-39588cadda2e/vrealize-automation-75-programming-guide.pdf
 
 A self-contained deployable integration between Terraform and vRealize Automation (vRA) which allows Terraform users to request/provision entitled vRA catalog items using Terraform. Supports Terraform destroying vRA provisioned resources.
 
