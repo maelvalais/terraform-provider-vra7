@@ -19,6 +19,7 @@ job:
   tags: [docker, rsc]
   before_script:
     - git config --global http.proxy $http_proxy
+    - git config --global https.proxy $http_proxy
     # First, make sure our project is in GOPATH, otherwise
     # we are going to hit a 'cannot determine module path for source directory'
     - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
