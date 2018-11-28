@@ -23,7 +23,6 @@ job:
   script:
     - go get
     - go install
-    - go
     - go test ./... -run ^BRMC$
     # - make check
     # - make race release
