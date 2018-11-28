@@ -18,6 +18,7 @@ job:
   # For now, I use Jerome Simon's private runner.
   tags: [docker, rsc]
   before_script:
+    - curl google.fr
     - git config --global http.proxy $http_proxy
     - git config --global https.proxy $http_proxy
     # First, make sure our project is in GOPATH, otherwise
