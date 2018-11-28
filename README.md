@@ -1,5 +1,12 @@
 # terraform-provider-vra7-brmc
 
+State of this project:
+
+- [x] Provisionning a VM on BRMC with `terraform apply`
+- [ ] Destroying it with `terraform destroy`
+- [ ] Provisionning a security group
+- [ ] Provisionning a NFS node
+
 My goal with this fork is to _adapt_ the upstream project
 [terraform-provider-vra7] to the non-conventional ways BRMC is implementing XaaS
 blueprints. As-is, [terraform-provider-vra7] cannot work for multiple reasons:
@@ -280,40 +287,78 @@ Optional:
 Example 1
 
 ```
-resource "vra7_resource" "example_machine1" {
-  catalog_name = "CentOS 6.3"
-   resource_configuration = {
-         Linux.cpu = "1"
-         Windows2008R2SP1.cpu =  "2"
-         Windows2012.cpu =  "4"
-         Windows2016.cpu =  "2"
-     }
-     catalog_configuration = {
-         lease_days = "5"
-     }
-     deployment_configuration = {
-         reasons      = "I have some"
-         description  = "deployment via terraform"
-     }
-     count = 3
+provider "vra7" {
+  username = "cfgl6581@ad.francetelecom.fr"
+  password = "<password>"
+  tenant   = "vsphere.local"
+  host     = "https://brmc.si.fr.intraorange"
+  insecure = true
 }
 
-```
+resource "vra7_resource" "vm" {
+  count = %d
 
-Example 2
+  catalog_name = "Provisionner une VM DCaaS"
 
-```
-resource "vra7_resource" "example_machine2" {
-  catalog_id = "e5dd4fba7f96239286be45ed"
-   resource_configuration = {
-         Linux.cpu = "1"
-         Windows2008.cpu =  "2"
-         Windows2012.cpu =  "4"
-         Windows2016.cpu =  "2"
-     }
-     count = 4
+  //businessgroup_name = "DOM-4"
+  businessgroup_id = "21e6cf47-952d-4b67-9881-439af6388a41"
+
+  // catalog_name = "Provisionner une VM FAST"
+
+  resource_configuration {
+    vmSuffix                   = "dvadxws00bxxxxx"
+    typeServeur                = "dv"                                            # dv (custom naming)
+    serverType                 = "Développement"
+    typeServerFullName         = "Développement"
+    predefinedRole             = "ws00"
+    role                       = "ws00"
+    customRole                 = "0"
+    customRoleValue            = "ws00"
+    module_applicatif          = "PF CC AGILE DELIVERY - DEV - DESI"
+    OS                         = "Pl@ton Linux RedHat"
+    region                     = "Normandie"
+    AZ                         = "Salle 4"
+    securityGroupName          = "SGIC-DOM-4-super-flux-N1"
+    cpu                        = "1"
+    ram                        = "1"
+    diskData                   = "0"
+    targetDiskSizeOfVm         = "20"
+    currentDiskSizeOfBlueprint = "20"
+    cos                        = "Standard"
+    leaseUnlimited             = false
+    lease                      = "90"
+    addDRSGroup                = "0"
+    backupPlanned              = "Désactivée"
+    codeBasicat                = "ADX"                                           // Example: ERB
+    commentaire                = "petite VM de test"                             // Example: A VM for testing
+    labelThresholdCPU          = "CPU limit crossed - you will need approval"
+    labelCPU                   = "1"                                             // Ne marche pas avec '3 vCPU' par exemple; je pense qu'ils parsent ce label
+    labelThresholdMemory       = "Memory limit crossed - you will need approval"
+    labelRam                   = "1GB"                                           // On peut y mettre n'importe quoi
+    labelDataDiskSize          = "0"
+    domainType                 = "DCaaS"
+    drsGroupDesc               = ""
+    groupeDRS                  = ""
+    hasBasicat                 = "1"
+    isBGFast                   = "0"
+    niveauSupport              = "P2"                                            // P2 = lowest support 8*5 a week, P1 = higher support, 24*7 a week
+    searchBasicat              = "adx"
+    useCloudInit               = "0"
+    cloudInitData              = ""                                              // "${data.template_file.cloud_init.rendered}"
+    supportEntity              = "/Orange/Of/Dtsi/Desi/Dixsi/Ptal/Pre"
+    clientEntity               = "/Orange/Of/Dtsi/Desi/Dixsi/Ptal/Pre"
+    bgName                     = "DOM-4"
+
+    // cactusGroupNames           = ""                                  // Example: [BRM000011] (see in cactus)
+  }
+  refresh_seconds = 10 // seconds
+  wait_timeout    = 30 // minutes
+
+  catalog_configuration {
+    reasons     = "Test"
+    description = "deployment via terraform"
+  }
 }
-
 ```
 
 Save this configuration in main.tf in a path where the binary is placed.
