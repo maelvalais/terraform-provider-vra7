@@ -10,8 +10,6 @@ variables:
   ## For now, I stick with 'dep ensure'
   # With TF_ACC=1, 'go test' will create actual resources on BRMC
   TF_ACC: 1
-  http_proxy: $THE_PROXY
-  https_proxy: $THE_PROXY
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
@@ -20,6 +18,8 @@ job:
   # For now, I use Jerome Simon's private runner.
   tags: [docker, rsc]
   before_script:
+    - export http_proxy=$THE_PROXY
+    - export https_proxy=$THE_PROXY
     - curl google.fr
     - git config --global http.proxy $THE_PROXY
     - git config --global https.proxy $THE_PROXY
