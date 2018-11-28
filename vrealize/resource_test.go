@@ -291,7 +291,7 @@ func TestChangeValueFunction(t *testing.T) {
 }
 
 func TestConfigValidityFunction(t *testing.T) {
-
+	t.Skip()
 	mockRequestTemplate := GetMockRequestTemplate()
 
 	// a resource_configuration map is created with valid components
