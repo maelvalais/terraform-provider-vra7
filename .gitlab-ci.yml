@@ -4,9 +4,12 @@ image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 # VRA_KEY, VRA_SECRET
 
 variables:
-  GO111MODULE: "on"
+  GO111MODULE: auto
+  ## For now, I disabled 'GO111MODULE=on go get' because:
+  ##     https://github.com/DHowett/go-plist/issues/40
+  ## For now, I stick with 'dep ensure'
   # With TF_ACC=1, 'go test' will create actual resources on BRMC
-  TF_ACC: "1"
+  TF_ACC: 1
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
@@ -18,11 +21,11 @@ job:
     - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
     - mkdir -p $CI_PROJECT_DIR && cp -r $PWD/. $CI_PROJECT_DIR && cd $CI_PROJECT_DIR
 
+    - go get -u github.com/golang/dep/cmd/dep
     - go get -u golang.org/x/lint/golint
 
   script:
-    - go get
-    - go install
+    - dep ensure
     - go test ./... -run ^BRMC$
     # - make check
     # - make race release
