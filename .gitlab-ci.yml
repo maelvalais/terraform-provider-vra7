@@ -13,8 +13,10 @@ variables:
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
-  # http://devops-store.rd.francetelecom.fr/en/dos?page_id=6538
-  tags: [docker, shared, innovation]
+  # http://devops-store.rd.francetelecom.fr/en/dos?page_id=6538.
+  # Tags: docker, shared, innovation
+  # For now, I use Jerome Simon's private runner.
+  tags: [docker, rsc]
   before_script:
     # First, make sure our project is in GOPATH, otherwise
     # we are going to hit a 'cannot determine module path for source directory'
