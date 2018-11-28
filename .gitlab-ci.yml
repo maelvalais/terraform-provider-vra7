@@ -37,8 +37,8 @@ job:
     - go get -u golang.org/x/lint/golint
 
   script:
-    - curl --insecure https://brmc.si.fr.intraorange/identity/api/tokens -v
     - dep ensure
+    - unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY NO_PROXY no_proxy
     - go test ./... -run BRMC
     # - make check
     # - make race release
