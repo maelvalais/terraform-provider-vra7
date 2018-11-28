@@ -186,18 +186,19 @@ Create _%APPDATA%/terraform.rc_ and put following content in it.
 
 ## Installation
 
-Clone repo code into go project using _go get_
+Clone repo code into go project using _go get_. Note that you need to be able to
+see the project (Orange permanent can, external people cannot for some reason...
+I cannot set the project as public as it is now impossible).
 
 ```
-    go get github.com/vmware/terraform-provider-vra7
-
+    go get gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7
 ```
 
 ## Create Binary
 
 **Linux and MacOS Users**
 
-Navigate to _/home/<USER>/TerraformPluginProject/src/github.com/vmware/terraform-provider-vra7_ and run go build command to generate plugin binary
+Navigate to _/home/<USER>/TerraformPluginProject/src/gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7_ and run go build command to generate plugin binary
 
 ```
     dep ensure
