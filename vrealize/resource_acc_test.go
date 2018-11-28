@@ -54,7 +54,7 @@ func TestAccMocked_basic(t *testing.T) {
 				  resource "vra7_resource" "resource_1" {
 						count = 1
 						catalog_name = "CentOS 6.3 - IPAM EXT"
-						resource_configuration = {
+						resource_configuration {
 							CentOS_6.3.cpu = "2"
             }
             refresh_seconds = 1
