@@ -11,6 +11,11 @@ variables:
   # With TF_ACC=1, 'go test' will create actual resources on BRMC
   TF_ACC: 1
 
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - /go/src
+
 job:
   # innovation necessary for getting internet access (through transparent proxying)
   # http://devops-store.rd.francetelecom.fr/en/dos?page_id=6538.
@@ -27,11 +32,11 @@ job:
     # we are going to hit a 'cannot determine module path for source directory'
     - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
     - rm -Rf $CI_PROJECT_DIR && mkdir -p $CI_PROJECT_DIR && cp -r $PWD/. $CI_PROJECT_DIR && cd $CI_PROJECT_DIR
-
     - go get -u github.com/golang/dep/cmd/dep
     - go get -u golang.org/x/lint/golint
 
   script:
+    - curl --insecure https://brmc.si.fr.intraorange/identity/api/tokens -v
     - dep ensure
     - go test ./... -run BRMC
     # - make check
