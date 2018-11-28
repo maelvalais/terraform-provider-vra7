@@ -59,7 +59,7 @@ resource "vra7_resource" "vm" {
 
   // catalog_name = "Provisionner une VM FAST"
 
-  resource_configuration = {
+  resource_configuration {
     vmSuffix                   = "dvadxws00bxxxxx"
     typeServeur                = "dv"                                            # dv (custom naming)
     serverType                 = "Développement"
@@ -81,29 +81,22 @@ resource "vra7_resource" "vm" {
     cos                        = "Standard"
     leaseUnlimited             = false
     lease                      = "90"
-    niveauSupport              = "P2"
     addDRSGroup                = "0"
     backupPlanned              = "Désactivée"
     codeBasicat                = "ADX"                                           // Example: ERB
     commentaire                = "petite VM de test"                             // Example: A VM for testing
-    cos                        = "Standard"
     labelThresholdCPU          = "CPU limit crossed - you will need approval"
     labelCPU                   = "1"                                             // Ne marche pas avec '3 vCPU' par exemple; je pense qu'ils parsent ce label
     labelThresholdMemory       = "Memory limit crossed - you will need approval"
     labelRam                   = "1GB"                                           // On peut y mettre n'importe quoi
-    currentDiskSizeOfBlueprint = "20"
-    diskData                   = "0"
     labelDataDiskSize          = "0"
-    targetDiskSizeOfVm         = "20"
     domainType                 = "DCaaS"
     drsGroupDesc               = ""
     groupeDRS                  = ""
     hasBasicat                 = "1"
     isBGFast                   = "0"
     niveauSupport              = "P2"                                            // P2 = lowest support 8*5 a week, P1 = higher support, 24*7 a week
-    region                     = "Normandie"
     searchBasicat              = "adx"
-    securityGroupName          = "SGIC-DOM-4-super-flux-N1"                      // example: 
     useCloudInit               = "0"
     cloudInitData              = ""                                              // "${data.template_file.cloud_init.rendered}"
     supportEntity              = "/Orange/Of/Dtsi/Desi/Dixsi/Ptal/Pre"
@@ -114,7 +107,8 @@ resource "vra7_resource" "vm" {
   }
   refresh_seconds = 10 // seconds
   wait_timeout    = 30 // minutes
-  catalog_configuration = {
+
+  catalog_configuration {
     reasons     = "Test"
     description = "deployment via terraform"
   }
