@@ -1,7 +1,7 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
 # Secret variables stored on Gitlab CI:
-# VRA_KEY, VRA_SECRET, http_proxy
+# VRA_KEY, VRA_SECRET, PROXY
 
 variables:
   GO111MODULE: auto
@@ -10,6 +10,8 @@ variables:
   ## For now, I stick with 'dep ensure'
   # With TF_ACC=1, 'go test' will create actual resources on BRMC
   TF_ACC: 1
+  http_proxy: $PROXY
+  https_proxy: $PROXY
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
