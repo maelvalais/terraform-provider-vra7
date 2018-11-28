@@ -1,7 +1,7 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
 # Secret variables stored on Gitlab CI:
-# VRA_KEY, VRA_SECRET
+# VRA_KEY, VRA_SECRET, http_proxy
 
 variables:
   GO111MODULE: auto
@@ -18,6 +18,7 @@ job:
   # For now, I use Jerome Simon's private runner.
   tags: [docker, rsc]
   before_script:
+    - git config --global http.proxy $http_proxy
     # First, make sure our project is in GOPATH, otherwise
     # we are going to hit a 'cannot determine module path for source directory'
     - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
