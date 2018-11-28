@@ -24,11 +24,7 @@
 [[constraint]]
   name = "github.com/dghubble/sling"
   version = "1.1.0"
-
-[[constraint]]
-  name = "github.com/hashicorp/terraform"
-  version = "0.10.7"
-
+  
 [[constraint]]
   branch = "v1"
   name = "gopkg.in/jarcoal/httpmock.v1"
