@@ -26,6 +26,6 @@ job:
 
   script:
     - dep ensure
-    - go test ./... -run ^BRMC$
+    - go test ./... -run BRMC
     # - make check
     # - make race release
