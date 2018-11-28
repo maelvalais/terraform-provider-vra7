@@ -243,30 +243,15 @@ func resourceSchema() map[string]*schema.Schema {
 		utils.DEPLOYMENT_CONFIGURATION: {
 			Type:     schema.TypeMap,
 			Optional: true,
-			Elem: &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Elem:     schema.TypeString,
-			},
 		},
 		utils.RESOURCE_CONFIGURATION: {
 			Type:     schema.TypeMap,
 			Optional: true,
 			Computed: true,
-			Elem: &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Elem:     schema.TypeString,
-			},
 		},
 		utils.CATALOG_CONFIGURATION: {
 			Type:     schema.TypeMap,
 			Optional: true,
-			Elem: &schema.Schema{
-				Type:     schema.TypeMap,
-				Optional: true,
-				Elem:     schema.TypeString,
-			},
 		},
 	}
 }
