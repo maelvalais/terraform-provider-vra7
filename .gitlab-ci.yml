@@ -1,7 +1,7 @@
 image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
 # Secret variables stored on Gitlab CI:
-# VRA_KEY, VRA_SECRET, PROXY
+# VRA_KEY, VRA_SECRET, THE_PROXY
 
 variables:
   GO111MODULE: auto
@@ -10,8 +10,8 @@ variables:
   ## For now, I stick with 'dep ensure'
   # With TF_ACC=1, 'go test' will create actual resources on BRMC
   TF_ACC: 1
-  http_proxy: $PROXY
-  https_proxy: $PROXY
+  http_proxy: $THE_PROXY
+  https_proxy: $THE_PROXY
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
@@ -21,8 +21,8 @@ job:
   tags: [docker, rsc]
   before_script:
     - curl google.fr
-    - git config --global http.proxy $http_proxy
-    - git config --global https.proxy $http_proxy
+    - git config --global http.proxy $THE_PROXY
+    - git config --global https.proxy $THE_PROXY
     # First, make sure our project is in GOPATH, otherwise
     # we are going to hit a 'cannot determine module path for source directory'
     - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
