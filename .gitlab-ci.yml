@@ -25,6 +25,7 @@ job:
   before_script:
     - export http_proxy=$THE_PROXY https_proxy=$THE_PROXY HTTP_PROXY=$THE_PROXY HTTPS_PROXY=$THE_PROXY
     - export https_proxy=$THE_PROXY
+    - export NO_PROXY='*.intraorange' no_proxy='*.intraorange'
     - curl google.fr
     - git config --global http.proxy $THE_PROXY
     - git config --global https.proxy $THE_PROXY
