@@ -15,8 +15,8 @@ job:
   before_script:
     # First, make sure our project is in GOPATH, otherwise
     # we are going to hit a 'cannot determine module path for source directory'
-    - CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
-    - mkdir -p $CI_PROJECT_DIR && mv $PWD/{*,.*} $CI_PROJECT_DIR && cd $CI_PROJECT_DIR
+    - export CI_PROJECT_DIR=${GOPATH}/src/${CI_PROJECT_URL/http?:\/\//}
+    - mkdir -p $CI_PROJECT_DIR && cp -r $PWD/. $CI_PROJECT_DIR && cd $CI_PROJECT_DIR
 
     - go get -u golang.org/x/lint/golint
 
