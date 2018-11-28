@@ -5,7 +5,8 @@ image: dockerproxy-cwfr1.rd.francetelecom.fr/golang:latest
 
 variables:
   GO111MODULE: on
-  TF_ACC: 1 # WARNING: 'go test' will create actual resources on BRMC
+  # With TF_ACC=1, 'go test' will create actual resources on BRMC
+  TF_ACC: 1
 
 job:
   # innovation necessary for getting internet access (through transparent proxying)
