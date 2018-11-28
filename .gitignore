@@ -1,7 +1,7 @@
 vra-terraform.log
 vra-terraform.log
 .vscode
-vendor
+vendor/
 modules.tf
 terraform.tfstate
 terraform.tfvars
