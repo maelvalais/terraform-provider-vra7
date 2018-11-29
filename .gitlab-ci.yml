@@ -19,8 +19,9 @@ cache:
 job:
   # innovation necessary for getting internet access (through transparent proxying)
   # http://devops-store.rd.francetelecom.fr/en/dos?page_id=6538.
-  # Tags: docker, shared, innovation
-  # For now, I use Jerome Simon's private runner.
+  # Innovation/Hermes: [docker, shared, innovation]
+  # Orange Forge: [docker, shared, forge]
+  # For now, I use Jerome Simon's private runner (shared runners disabled)
   tags: [docker, rsc]
   before_script:
     - export http_proxy=$THE_PROXY https_proxy=$THE_PROXY HTTP_PROXY=$THE_PROXY HTTPS_PROXY=$THE_PROXY
