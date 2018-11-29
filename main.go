@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/terraform"
-	"gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7/vrealize"
-	"gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7/utils"
+	"gitlab.forge.orange-labs.fr/vrabrmc/terraform-provider-vra7/vrealize"
+	"gitlab.forge.orange-labs.fr/vrabrmc/terraform-provider-vra7/utils"
 )
 
 func main() {

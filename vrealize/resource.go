@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/op/go-logging"
-	"gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7/utils"
+	"gitlab.forge.orange-labs.fr/vrabrmc/terraform-provider-vra7/utils"
 )
 
 var (

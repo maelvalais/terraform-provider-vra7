@@ -191,14 +191,14 @@ see the project (Orange permanent can, external people cannot for some reason...
 I cannot set the project as public as it is now impossible).
 
 ```
-    go get gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7
+    go get gitlab.forge.orange-labs.fr/vrabrmc/terraform-provider-vra7
 ```
 
 ## Create Binary
 
 **Linux and MacOS Users**
 
-Navigate to _/home/<USER>/TerraformPluginProject/src/gitlab.forge.orange-labs.fr/nlgn2101/terraform-provider-vra7_ and run go build command to generate plugin binary
+Navigate to _/home/<USER>/TerraformPluginProject/src/gitlab.forge.orange-labs.fr/vrabrmc/terraform-provider-vra7_ and run go build command to generate plugin binary
 
 ```
     dep ensure
