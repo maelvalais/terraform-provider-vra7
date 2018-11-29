@@ -22,12 +22,13 @@ job:
   # Innovation/Hermes: [docker, shared, innovation]
   # Orange Forge: [docker, shared, forge]
   # For now, I use Jerome Simon's private runner (shared runners disabled)
-  tags: [docker, rsc]
+  tags: [docker, shared, forge]
   before_script:
     - export http_proxy=$THE_PROXY https_proxy=$THE_PROXY HTTP_PROXY=$THE_PROXY HTTPS_PROXY=$THE_PROXY
     - export https_proxy=$THE_PROXY
     - export NO_PROXY='*.intraorange' no_proxy='*.intraorange'
     - curl google.fr
+    - http_proxy= https_proxy= HTTP_PROXY= HTTPS_PROXY= NO_PROXY= no_proxy= curl https://brmc.si.fr.intraorange
     - git config --global http.proxy $THE_PROXY
     - git config --global https.proxy $THE_PROXY
     # First, make sure our project is in GOPATH, otherwise
