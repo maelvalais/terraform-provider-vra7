@@ -2,6 +2,9 @@ package vrealize
 
 import (
 	"fmt"
+
+	"github.com/vmware/terraform-provider-vra7/api"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -53,7 +56,7 @@ func providerSchema() map[string]*schema.Schema {
 //Function use - To authenticate terraform provider
 func providerConfig(r *schema.ResourceData) (interface{}, error) {
 	//Create a client handle to perform REST calls for various operations upon the resource
-	client := NewClient(r.Get("username").(string),
+	client := api.NewClient(r.Get("username").(string),
 		r.Get("password").(string),
 		r.Get("tenant").(string),
 		r.Get("host").(string),

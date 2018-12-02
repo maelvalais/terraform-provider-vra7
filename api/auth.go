@@ -1,4 +1,4 @@
-package vrealize
+package api
 
 import (
 	"crypto/tls"
@@ -7,12 +7,16 @@ import (
 	"time"
 
 	"github.com/dghubble/sling"
+	logging "github.com/op/go-logging"
+	"github.com/vmware/terraform-provider-vra7/utils"
 )
 
-//APIClient - This struct is used to store information provided in .tf file under provider block
+var log = logging.MustGetLogger(utils.LOGGER_ID)
+
+//Client - This struct is used to store information provided in .tf file under provider block
 //Later on, this stores bearToken after successful authentication and uses that token for next
 //REST get or post calls.
-type APIClient struct {
+type Client struct {
 	Username    string
 	Password    string
 	BaseURL     string
@@ -41,16 +45,35 @@ type AuthResponse struct {
 type ActionResponseTemplate struct {
 }
 
+//Error struct is used to store REST call errors
+type Error struct {
+	Errors []struct {
+		Code          int    `json:"code"`
+		Message       string `json:"message"`
+		SystemMessage string `json:"systemMessage"`
+	} `json:"errors"`
+}
+
+//Error stringifies the REST call errors.
+func (e *Error) Error() string {
+	return fmt.Sprintf("vRealize API: %+v", e.Errors)
+}
+
+//IsEmpty returns true when no error exists.
+func (e *Error) IsEmpty() bool {
+	return len(e.Errors) == 0
+}
+
 //NewClient - set provider authentication details in struct
 //which will be used for all REST call authentication
-func NewClient(username string, password string, tenant string, baseURL string, insecure bool) APIClient {
+func NewClient(username string, password string, tenant string, baseURL string, insecure bool) Client {
 	// This overrides the DefaultTransport which is probably ok
 	// since we're generally only using a single client.
 	transport := http.DefaultTransport.(*http.Transport)
 	transport.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: insecure,
 	}
-	return APIClient{
+	return Client{
 		Username: username,
 		Password: password,
 		Tenant:   tenant,
@@ -63,7 +86,7 @@ func NewClient(username string, password string, tenant string, baseURL string, 
 }
 
 //Authenticate - set call for user authentication
-func (c *APIClient) Authenticate() error {
+func (c *Client) Authenticate() error {
 	//Set user credentials details as a parameter to authenticate user
 	params := &AuthRequest{
 		Username: c.Username,
@@ -72,18 +95,18 @@ func (c *APIClient) Authenticate() error {
 	}
 
 	authRes := new(AuthResponse)
-	apiError := new(APIError)
+	Error := new(Error)
 	//Set a REST call to generate token using above user credentials
 	_, err := c.HTTPClient.New().Post("/identity/api/tokens").BodyJSON(params).
-		Receive(authRes, apiError)
+		Receive(authRes, Error)
 
 	if err != nil {
 		return err
 	}
 
-	if !apiError.isEmpty() {
-		log.Errorf("%s\n", apiError.Error())
-		return fmt.Errorf("%s", apiError.Error())
+	if !Error.IsEmpty() {
+		log.Errorf("%s\n", Error.Error())
+		return fmt.Errorf("%s", Error.Error())
 	}
 
 	//Get a bearer token

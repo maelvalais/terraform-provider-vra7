@@ -1,4 +1,4 @@
-package vrealize
+package api
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ type CatalogItem struct {
 }
 
 //GetCatalogItemRequestTemplate - Call to retrieve a request template for a catalog item.
-func (c *APIClient) GetCatalogItemRequestTemplate(catalogItemId string) (*CatalogItemRequestTemplate, error) {
+func (c *Client) GetCatalogItemRequestTemplate(catalogItemId string) (*CatalogItemRequestTemplate, error) {
 	//Form a path to read catalog request template via REST call
 	path := fmt.Sprintf("/catalog-service/api/consumer/entitledCatalogItems/"+
 		"%s/requests/template",
@@ -37,16 +37,16 @@ func (c *APIClient) GetCatalogItemRequestTemplate(catalogItemId string) (*Catalo
 	log.Info("GetCatalogItemRequestTemplate->path %v\n", path)
 
 	requestTemplate := new(CatalogItemRequestTemplate)
-	apiError := new(APIError)
+	Error := new(Error)
 	//Make the REST call to get catalog request template
-	_, err := c.HTTPClient.New().Get(path).Receive(requestTemplate, apiError)
+	_, err := c.HTTPClient.New().Get(path).Receive(requestTemplate, Error)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if !apiError.isEmpty() {
-		return nil, apiError
+	if !Error.IsEmpty() {
+		return nil, Error
 	}
 	//Return catalog item template
 	log.Info("GetCatalogItemRequestTemplate->requestTemplate %v\n", requestTemplate)
@@ -65,29 +65,29 @@ type Metadata struct {
 }
 
 // readCatalogItemNameByID - This function returns the catalog item name using catalog item ID
-func (c *APIClient) readCatalogItemNameByID(catalogItemID string) (string, error) {
+func (c *Client) readCatalogItemNameByID(catalogItemID string) (string, error) {
 	//Form a path to read catalog template via REST call
 	path := fmt.Sprintf("/catalog-service/api/consumer/entitledCatalogItems/"+
 		"%s", catalogItemID)
 
 	template := new(CatalogItem)
-	apiError := new(APIError)
+	Error := new(Error)
 	//Make a REST call to get catalog template
-	_, err := c.HTTPClient.New().Get(path).Receive(template, apiError)
+	_, err := c.HTTPClient.New().Get(path).Receive(template, Error)
 
 	if err != nil {
 		return "", err
 	}
 
-	if !apiError.isEmpty() {
-		return "", apiError
+	if !Error.IsEmpty() {
+		return "", Error
 	}
 	//Return catalog Name
 	return template.CatalogItem.Name, nil
 }
 
 //readCatalogItemIdByName - To read id of catalog from vRA using catalog_name
-func (c *APIClient) readCatalogItemIDByName(catalogName string) (string, error) {
+func (c *Client) readCatalogItemIDByName(catalogName string) (string, error) {
 	var catalogItemID string
 
 	log.Info("readCatalogItemIdByName->catalog_name %v\n", catalogName)
@@ -96,25 +96,25 @@ func (c *APIClient) readCatalogItemIDByName(catalogName string) (string, error) 
 	path := fmt.Sprintf("catalog-service/api/consumer/entitledCatalogItemViews")
 
 	template := new(entitledCatalogItemViews)
-	apiError := new(APIError)
+	Error := new(Error)
 
-	_, preErr := c.HTTPClient.New().Get(path).Receive(template, apiError)
+	_, preErr := c.HTTPClient.New().Get(path).Receive(template, Error)
 
 	if preErr != nil {
 		return "", preErr
 	}
 
-	if !apiError.isEmpty() {
-		return "", apiError
+	if !Error.IsEmpty() {
+		return "", Error
 	}
 
 	//Fetch all catalogs from vRA
 	path = fmt.Sprintf("catalog-service/api/consumer/entitledCatalogItemViews?page=1&"+
 		"limit=%d", template.Metadata.TotalElements)
-	resp, errResp := c.HTTPClient.New().Get(path).Receive(template, apiError)
+	resp, errResp := c.HTTPClient.New().Get(path).Receive(template, Error)
 
-	if !apiError.isEmpty() {
-		return "", apiError
+	if !Error.IsEmpty() {
+		return "", Error
 	}
 
 	if resp.StatusCode != 200 {
@@ -156,8 +156,8 @@ func (c *APIClient) readCatalogItemIDByName(catalogName string) (string, error) 
 			"Please select from above.", punctuation, len(catalogItemNameArray), errorMessage)
 	}
 
-	if !apiError.isEmpty() {
-		return "", apiError
+	if !Error.IsEmpty() {
+		return "", Error
 	}
 	return catalogItemID, nil
 }

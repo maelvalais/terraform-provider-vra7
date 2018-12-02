@@ -1,24 +1,11 @@
-package vrealize
+package api
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"gopkg.in/jarcoal/httpmock.v1"
 )
-
-func init() {
-	fmt.Println("init")
-	// These are mock test credentials
-	client = NewClient(
-		"admin@myvra.local",
-		"pass!@#",
-		"vsphere.local",
-		"http://localhost/",
-		true,
-	)
-}
 
 var catalogItemId1 = "e5dd4fba-45ed-4943-b1fc-7f96239286be"
 var catalogItemId2 = "e5dd4fba-45ed-4943-b1fc-7f96239286b1"
@@ -61,6 +48,7 @@ var catalogItemTemplateResp = `{"catalogItem":{"callbacks":null,"catalogItemType
 "tenantLabel":"vsphere.local","subtenantRef":"53619006-56bb-4788-9723-9eab79752cc1","subtenantLabel":"Content"}]}`
 
 func TestFetchCatalogItemByName(t *testing.T) {
+	client := MockClient()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -164,6 +152,7 @@ func TestFetchCatalogItemByName(t *testing.T) {
 // 1) Fetch catalog item details using correct catalog item ID
 // 2) Fetch catalog item details with invalid catalog item ID
 func TestFetchCatalogItemByID(t *testing.T) {
+	client := MockClient()
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 	httpmock.RegisterResponder("GET", "http://localhost/catalog-service/api/consumer/entitledCatalogItems/"+catalogItemId1,
